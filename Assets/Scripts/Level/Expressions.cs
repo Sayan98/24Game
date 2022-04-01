@@ -27,7 +27,9 @@ public class Expressions : MonoBehaviour {
     private GetData _getData;
 
     public Text debugText;
-    
+    public int hintstreak, sol;
+
+
 
     private Expressions() {
 
@@ -41,7 +43,7 @@ public class Expressions : MonoBehaviour {
         _letters = new string[4];
     }
 
-    void Start() {
+    private void Start() {
         
         _getData = GameObject.Find("GetData").GetComponent<GetData>();
 
@@ -125,6 +127,8 @@ public class Expressions : MonoBehaviour {
         if(allUsed && _resultText.text == "24" || _resultText.text == "-24" && allUsed) {
                 
             _resultText.text = "24";
+            sol++;
+            debugText.text = null;
             yield return new WaitForSecondsRealtime(0.5f);
             ResetLevel(true);
         }
@@ -144,7 +148,7 @@ public class Expressions : MonoBehaviour {
         
         _resultText.text = output.ToString();
 
-        for (int i = 0; i < input.Length; i=i+2)
+        for (var i = 0; i < input.Length; i+=2)
             if(i+2 < input.Length && !input[i+2].Equals(operatorSigns)) {
             
                 output = float.Parse(Calculation(output + "" + input[i+1] + "" + input[i+2]));
@@ -166,7 +170,7 @@ public class Expressions : MonoBehaviour {
 
     
     private void DeleteLastInput() {
-        
+    // DELETE LAST INPUT FROM USER   
         if (_inputString == null) return;
         
         /*for (var i = 0; i < 4; i++) {
@@ -198,7 +202,7 @@ public class Expressions : MonoBehaviour {
 
 
     public void ResetLevel(bool shuffle) {
-
+    //CLEAR SCREEN AND GENERATE NEW NUMBER AND SOLUTION
         _resultText.text = _operationText.text = _inputString = "";
         
         for (var i = 0; i < 4; i++) 
@@ -211,7 +215,7 @@ public class Expressions : MonoBehaviour {
 
 
     private IEnumerator ShuffleNumber(float t) {
-
+    //SHUFFLE CURRENT BOARD NUMBERS
         yield return new WaitForSecondsRealtime(t);
 
         _hintSolution = GenerateSolution();
@@ -226,7 +230,7 @@ public class Expressions : MonoBehaviour {
     }
 
     private IEnumerator SetupLevel() {
-        
+    //SETUP BOARD AT THE BEGINNING WITH TOKENS 
         yield return null;
         var delayTime = 0.0f;
 
@@ -239,11 +243,15 @@ public class Expressions : MonoBehaviour {
 
         for (int i = 0; i < 4; i++)
             _miscellaneousButton[i].DOScale(Vector2.one, 0.25f);
+        
+        _miscellaneousButton[3].DOScale(new Vector2(0.8f, 0.8f), 0.25f);
+        
     }
     
     public void ShowHint() {
-
+    //DISPLAY HINT
        debugText.text = _hintSolution;
+       hintstreak++;
     }
 
 
@@ -304,7 +312,7 @@ public class Expressions : MonoBehaviour {
                                 
                     //digits = digits + "((" + b[i] + operatorSigns[f1] + b[j] + ")" + operatorSigns[f2] + b[k] + ")" + operatorSigns[f3] + b[l];
                     digits = b[i] + operatorSigns[f1] + b[j] + operatorSigns[f2] + b[k] + operatorSigns[f3] + b[l];
-                    if ((n != 0) && (++c >= n)) return(digits);
+                    if ((n != 0) && (++c >= n)) return digits;
                     break;
                 }
 
@@ -314,7 +322,7 @@ public class Expressions : MonoBehaviour {
                                 
                     //digits = digits + b[i] + operatorSigns[f1] + "((" + b[j] + operatorSigns[f2] + b[k] + ")" + operatorSigns[f3] + b[l] + ")";
                     digits = b[j] + operatorSigns[f2] + b[k] +  operatorSigns[f3] + b[l] + operatorSigns[f1] + b[i];
-                    if ((n != 0) && (++c >= n)) return(digits);
+                    if ((n != 0) && (++c >= n)) return digits;
                     break;
                 }
 
@@ -324,7 +332,7 @@ public class Expressions : MonoBehaviour {
                 
                     //digits = digits + "(" + b[i] + operatorSigns[f1] + "(" + b[j] + operatorSigns[f2] + b[k] + "))" + operatorSigns[f3] + b[l];
                     digits = b[j] + operatorSigns[f2] + b[k] + operatorSigns[f1] + b[i] + operatorSigns[f3] + b[l];
-                    if ((n != 0) && (++c >= n)) return(digits);
+                    if ((n != 0) && (++c >= n)) return digits;
                     break;
                 }
 
@@ -334,7 +342,7 @@ public class Expressions : MonoBehaviour {
 
                     //digits = digits + b[i] + disoper[f1] + "(" + b[j] + disoper[f2] + "(" + b[k] + disoper[f3] + b[l] + "))";
                     digits = b[k] + operatorSigns[f3] + b[l] + operatorSigns[f2] + b[j] + operatorSigns[f1] + b[i];
-                    if ((n != 0) && (++c >= n)) return(digits);
+                    if ((n != 0) && (++c >= n)) return digits;
                     break;
                 }
             }
@@ -366,14 +374,28 @@ public class Expressions : MonoBehaviour {
                 }
         }
 
+        Debug.Log(digits[digits.Length-2] + "::" + digits[digits.Length-4]);
+        if(digits[digits.Length-2] == '/' && digits[digits.Length-4] == '/') {
+            
+            char[] qc = digits.ToCharArray();
+            qc[qc.Length - 2] = '*';
+            digits = new string(qc);
+            Debug.Log("replaced");
+        }
+        Debug.Log(digits[digits.Length-2]);
+       /* if(multi && div && cc < 2)
+            Debug.Log("ok");
+        else
+            digits = GenerateSolution();*/
+        
+
         if(_getData.Difficulty < 0 && multi && !div || _getData.Difficulty > 0 && multi && div && cc == 1 ||
-                                                        _getData.Difficulty == 0 && !multi && div)
+                                                        _getData.Difficulty == 0 && div && cc == 1)
             Debug.Log("all good");
         else
             digits = GenerateSolution();
 
-
-            return(digits);
+        return digits;
 
     }
 

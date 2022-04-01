@@ -7,7 +7,7 @@ public class PlayerData {
    
     public bool Arcade;
     public int Streak, Difficulty, Rank, CurrentXp, NeededXp;
-    public bool[] ToggleOn = new bool[3];  
+    public bool[] ToggleOn = new bool[4];  
     
     public PlayerData(GetData value) {
         
@@ -19,7 +19,7 @@ public class PlayerData {
         CurrentXp = value.CurrentXp;
         NeededXp = value.NeededXp;
 
-        for (var i = 0; i < 3; i++)
+        for (var i = 0; i < 4; i++)
             ToggleOn[i] = value.ToggleOn[i];
     }
     

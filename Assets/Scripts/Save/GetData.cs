@@ -9,8 +9,8 @@ public class GetData : MonoBehaviour {
     public bool[] ToggleOn;       //OPTIONS
 
    
-    void Awake() {
-       
+    private void Awake() {
+
         var data = SaveLoad.LoadFile();
         if(data == null) {
 
@@ -26,8 +26,8 @@ public class GetData : MonoBehaviour {
         CurrentXp = data.CurrentXp;
         NeededXp = data.NeededXp;
 
-        if(SceneManager.GetActiveScene().buildIndex == 1) return;
-        for (var i = 0; i < 3; i++)
+        if(SceneManager.GetActiveScene().buildIndex.Equals(1)) return;
+        for (var i = 0; i < 4; i++)
             ToggleOn[i] = data.ToggleOn[i];
     }
 
@@ -43,6 +43,7 @@ public class GetData : MonoBehaviour {
 
         for (var i = 0; i < 3; i++)
             ToggleOn[i] = true;
+        ToggleOn[3] = false;
 
         SaveLoad.SaveFile(this);
     }
